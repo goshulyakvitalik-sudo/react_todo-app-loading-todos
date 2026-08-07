@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 /* eslint-disable jsx-a11y/control-has-associated-label */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import { getTodos, USER_ID } from './api/todos';
 import { Todo } from './types/Todo';
@@ -13,9 +13,25 @@ export const App: React.FC = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [errorMessage, setErrorMessage] = useState('');
   const [filter, setFilter] = useState<Filter>('All');
+  const [title, setTitle] = useState('');
+
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const hideError = () => {
     setErrorMessage('');
+  };
+
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+
+    if (!title.trim()) {
+      setErrorMessage('Title should not be empty');
+      inputRef.current?.focus();
+
+      return;
+    }
+
+    // Тут наступним кроком додамо createTodo(...)
   };
 
   useEffect(() => {
@@ -34,6 +50,10 @@ export const App: React.FC = () => {
           setErrorMessage('');
         }, 3000);
       });
+  }, []);
+
+  useEffect(() => {
+    inputRef.current?.focus();
   }, []);
 
   let visibleTodos = todos;
@@ -71,12 +91,15 @@ export const App: React.FC = () => {
             data-cy="ToggleAllButton"
           />
 
-          <form>
+          <form onSubmit={handleSubmit}>
             <input
+              ref={inputRef}
               data-cy="NewTodoField"
               type="text"
               className="todoapp__new-todo"
               placeholder="What needs to be done?"
+              value={title}
+              onChange={event => setTitle(event.target.value)}
             />
           </form>
         </header>
