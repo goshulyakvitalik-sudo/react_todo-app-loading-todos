@@ -1,4 +1,3 @@
-import { title } from 'process';
 import { Todo } from '../types/Todo';
 import { client } from '../utils/fetchClient';
 
@@ -9,12 +8,20 @@ export const getTodos = () => {
 };
 
 export const createTodo = (title: string) => {
-  return client.post<Todo>(
-    '/todos',
-    {
-      userId: USER_ID,
-      title,
-      completed: false
-    },
-  );
+  return client.post<Todo>('/todos', {
+    userId: USER_ID,
+    title,
+    completed: false,
+  });
+};
+
+export const deleteTodo = (todoId: number) => {
+  return client.delete(`/todos/${todoId}`);
+};
+
+export const updateTodo = (
+  todoId: number,
+  data: Partial<Pick<Todo, 'title' | 'completed'>>,
+) => {
+  return client.patch<Todo>(`/todos/${todoId}`, data);
 };
